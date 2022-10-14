@@ -2,15 +2,14 @@ import { Contacts } from './ContactsList.styled';
 import { ContactsItem } from '../ContactsItem/ContactsItem';
 import { useSelector } from 'react-redux';
 import { useGetContactByNameQuery } from 'redux/contactsApi';
+import { Spinner } from '../Spinner/Spinner';
 
 export const ContactsList = () => {
-  const contacts = useGetContactByNameQuery().data;
+  const { data: contacts, isLoading } = useGetContactByNameQuery();
   const { filter } = useSelector(state => state.filter);
 
-  console.log(contacts);
-
   const getVisibleContacts = () => {
-    if (!contacts || !contacts.length > 0) {
+    if (!contacts) {
       return;
     }
 
@@ -23,9 +22,12 @@ export const ContactsList = () => {
 
   const visibleContacts = getVisibleContacts();
 
+  console.log(isLoading, visibleContacts, visibleContacts);
+
   return (
     <>
-      {visibleContacts && visibleContacts.length > 0 ? (
+      {isLoading && <Spinner />}
+      {visibleContacts && visibleContacts.length > 0 && (
         <Contacts>
           {visibleContacts.map(({ name, number, id }) => {
             return (
@@ -33,8 +35,9 @@ export const ContactsList = () => {
             );
           })}
         </Contacts>
-      ) : (
-        <div>There are no contacts.</div>
+      )}
+      {!isLoading && !visibleContacts.length > 0 && (
+        <div>There is no contacts.</div>
       )}
     </>
   );
